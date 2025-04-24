@@ -154,13 +154,7 @@
         risk_value = document.getElementById("custom_risk_value").value;
       }
 
-      let user_id = null;
-      try {
-        user_id = Telegram.WebApp.initDataUnsafe.user.id;
-      } catch (e) {
-        console.warn("❌ Cannot detect Telegram user ID", e);
-      }
-
+      const user_id = Telegram.WebApp.initDataUnsafe?.user?.id;
       if (!user_id) {
         msg.textContent = "❌ Failed to detect Telegram user ID. Please open this form inside Telegram.";
         msg.className = "message";
@@ -168,7 +162,6 @@
       }
 
       const data = { user_id, login, password, broker, risk_type, risk_value };
-      console.log("📤 Sending to backend:", data);
 
       try {
         const res = await fetch("https://mt5formbackend-production.up.railway.app/save_mt5_data", {
