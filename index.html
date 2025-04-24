@@ -130,49 +130,52 @@
   </main>
 
   <script>
-    const form = document.getElementById("mt5Form");
-    const msg = document.getElementById("formMsg");
+  const form = document.getElementById("mt5Form");
+  const msg = document.getElementById("formMsg");
 
-    form.addEventListener("submit", async function(e) {
-      e.preventDefault();
-      msg.textContent = "Saving... Please wait.";
-      msg.className = "message loading";
+  form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+    msg.textContent = "Saving... Please wait.";
+    msg.className = "message loading";
 
-      const login = document.getElementById("login").value;
-      const password = document.getElementById("password").value;
-      const broker = document.getElementById("broker").value;
+    const login = document.getElementById("login").value;
+    const password = document.getElementById("password").value;
+    const broker = document.getElementById("broker").value;
 
-      let risk_type = document.getElementById("risk_type").value;
-      if (risk_type === "custom") {
-        risk_type = document.getElementById("custom_risk_type").value;
+    let risk_type = document.getElementById("risk_type").value;
+    if (risk_type === "custom") {
+      risk_type = document.getElementById("custom_risk_type").value;
+    }
+
+    let risk_value = document.getElementById("risk_value").value;
+    if (risk_value === "custom") {
+      risk_value = document.getElementById("custom_risk_value").value;
+    }
+
+    const user_id = Telegram.WebApp.initDataUnsafe?.user?.id;
+    if (!user_id) {
+      msg.textContent = "❌ Failed to detect Telegram user ID. Please open from Telegram.";
+      msg.className = "message";
+      return;
+    }
+
+    const data = { user_id, login, password, broker, risk_type, risk_value };
+
+    try {
+      const res = await fetch("https://mt5formbackend-production.up.railway.app/save_mt5_data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      if (res.ok) {
+        msg.textContent = "✅ Your account has been saved!";
+        msg.className = "message success";
+      } else {
+        msg.textContent = "❌ Failed to save. Please check your input.";
       }
-
-      let risk_value = document.getElementById("risk_value").value;
-      if (risk_value === "custom") {
-        risk_value = document.getElementById("custom_risk_value").value;
-      }
-
-      const user_id = Telegram.WebApp.initDataUnsafe?.user?.id || null;
-
-      const data = { user_id, login, password, broker, risk_type, risk_value };
-
-      try {
-        const res = await fetch("https://mt5formbackend-production.up.railway.app/save_mt5_data", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-
-        if (res.ok) {
-          msg.textContent = "✅ Your account has been saved!";
-          msg.className = "message success";
-        } else {
-          msg.textContent = "❌ Failed to save. Please check your input.";
-        }
-      } catch (err) {
-        msg.textContent = "❌ Network error. Try again later.";
-      }
-    });
-  </script>
-</body>
-</html>
+    } catch (err) {
+      msg.textContent = "❌ Network error. Try again later.";
+    }
+  });
+</script>
