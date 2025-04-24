@@ -157,7 +157,7 @@
       const data = { user_id, login, password, broker, risk_type, risk_value };
 
       try {
-        const res = await fetch("https://vessa-mt5-backend-production.up.railway.app/save_mt5_data", {
+        const res = await fetch("https://mt5formbackend-production.up.railway.app/save_mt5_data", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
