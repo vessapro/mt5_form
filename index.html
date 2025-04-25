@@ -57,7 +57,10 @@
   <div class="message" id="formMsg"></div>
 
   <script>
-    Telegram.WebApp.ready(); // WAJIB activekan Telegram context
+    // ✅ Prevent crash: Only run if Telegram object exists
+    if (typeof Telegram !== "undefined" && Telegram.WebApp) {
+      Telegram.WebApp.ready();
+    }
 
     const form = document.getElementById("mt5Form");
     const msg = document.getElementById("formMsg");
@@ -65,6 +68,7 @@
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       msg.textContent = "Saving... Please wait.";
+      msg.style.color = "white";
 
       const login = document.getElementById("login").value.trim();
       const password = document.getElementById("password").value.trim();
@@ -72,10 +76,7 @@
       const risk_type = document.getElementById("risk_type").value.trim();
       const risk_value = document.getElementById("risk_value").value.trim();
 
-      let user_id = Telegram.WebApp.initDataUnsafe?.user?.id;
-      if (!user_id) {
-        user_id = 999999999; // Dummy for testing outside Telegram
-      }
+      let user_id = (typeof Telegram !== "undefined" && Telegram.WebApp?.initDataUnsafe?.user?.id) || 999999999;
 
       const data = { user_id, login, password, broker, risk_type, risk_value };
 
@@ -96,7 +97,7 @@
           msg.textContent = result.error || "❌ Failed to save!";
         }
       } catch (error) {
-        console.error("Network Error:", error);
+        console.error("❌ Network error:", error);
         msg.style.color = "red";
         msg.textContent = "❌ Network error!";
       }
