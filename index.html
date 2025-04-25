@@ -38,7 +38,7 @@
 
   <h1>Connect MT5 Account</h1>
 
-  <form id="mt5Form" method="POST" action="https://mt5formbackend-production.up.railway.app/save_mt5_data">
+  <form id="mt5Form">
     <input type="text" id="login" name="login" placeholder="MT5 Login" required>
     <input type="password" id="password" name="password" placeholder="MT5 Password" required>
     <input type="text" id="broker" name="broker" placeholder="Broker (Exness-Live3)" required>
@@ -50,9 +50,6 @@
     </select>
     
     <input type="text" id="risk_value" name="risk_value" placeholder="Risk Value (e.g. 0.01 or 5%)" required>
-
-    <!-- ✅ Hidden input for user_id -->
-    <input type="hidden" id="user_id" name="user_id">
 
     <button type="submit">Save Details</button>
   </form>
@@ -67,18 +64,46 @@
     const form = document.getElementById("mt5Form");
     const msg = document.getElementById("formMsg");
 
-    // ✅ Inject user_id sebelum submit
-    form.addEventListener("submit", function(e) {
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      msg.textContent = "Saving... Please wait.";
+      msg.style.color = "white";
+
       const user_id = Telegram.WebApp?.initDataUnsafe?.user?.id;
       if (!user_id) {
-        e.preventDefault();
-        msg.style.color = "red";
         msg.textContent = "❌ Failed to detect Telegram user ID.";
+        msg.style.color = "red";
         return;
       }
-      document.getElementById("user_id").value = user_id;
-      msg.style.color = "white";
-      msg.textContent = "Saving... Please wait.";
+
+      const formData = new FormData();
+      formData.append("user_id", user_id);
+      formData.append("login", document.getElementById("login").value.trim());
+      formData.append("password", document.getElementById("password").value.trim());
+      formData.append("broker", document.getElementById("broker").value.trim());
+      formData.append("risk_type", document.getElementById("risk_type").value.trim());
+      formData.append("risk_value", document.getElementById("risk_value").value.trim());
+
+      try {
+        const res = await fetch("https://mt5formbackend-production.up.railway.app/save_mt5_data", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          msg.style.color = "#00ff99";
+          msg.textContent = "✅ Saved successfully!";
+        } else {
+          msg.style.color = "orange";
+          msg.textContent = "❌ Failed: " + (result.error || "Unknown error");
+        }
+      } catch (error) {
+        console.error("❌ Network error:", error);
+        msg.style.color = "red";
+        msg.textContent = "❌ Network error!";
+      }
     });
   </script>
 
