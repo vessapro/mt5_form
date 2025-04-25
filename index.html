@@ -2,163 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>VessaPro MT5 Form</title>
+  <title>Connect Your MT5 Account</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       background-color: #0d0d0d;
-      font-family: 'Segoe UI', sans-serif;
       color: white;
-      margin: 0;
-      padding: 0;
+      font-family: Arial, sans-serif;
       text-align: center;
-    }
-    header {
-      background-color: #111;
       padding: 20px;
     }
-    header img {
-      height: 40px;
-    }
-    main {
-      padding: 20px;
-    }
-    .form-container {
-      background-color: #1a1a1a;
-      padding: 25px;
-      border-radius: 15px;
-      max-width: 400px;
-      margin: 0 auto;
-      box-shadow: 0 0 20px rgba(255,255,255,0.05);
-    }
-    h2 {
-      margin-bottom: 20px;
-      color: #fff;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-      text-align: left;
-    }
-    input, select {
-      width: 100%;
+    input, select, button {
+      width: 90%;
+      margin: 10px 0;
       padding: 10px;
-      margin-top: 5px;
+      font-size: 16px;
       border-radius: 5px;
       border: none;
-      background-color: #2a2a2a;
+      background: #1a1a1a;
       color: white;
-      font-size: 14px;
     }
     button {
-      margin-top: 20px;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 5px;
       background: linear-gradient(135deg, #00ffc6, #0066ff);
       color: black;
       font-weight: bold;
-      font-size: 16px;
       cursor: pointer;
-      width: 100%;
     }
     .message {
       margin-top: 15px;
       font-size: 14px;
-      font-weight: bold;
-    }
-    .back-btn {
-      margin-top: 20px;
-      color: #999;
-      display: inline-block;
-      text-decoration: underline;
-      font-size: 13px;
-      cursor: pointer;
-    }
-    .loading {
-      color: #00ffc6;
-    }
-    .success {
-      color: #00ff99;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="https://vessapro.github.io/mt5_form/Small-Font-With-Logo-White.png" alt="VessaPro Logo">
-  </header>
-  <main>
-    <div class="form-container">
-      <h2>Connect Your MT5 Account</h2>
-      <form id="mt5Form">
-        <label for="login">MT5 Login</label>
-        <input type="text" id="login" name="login" required>
 
-        <label for="password">MT5 Password</label>
-        <input type="password" id="password" name="password" required>
+  <h1>Connect MT5 Account</h1>
 
-        <label for="broker">Broker (e.g. Exness-Live3)</label>
-        <input type="text" id="broker" name="broker" required>
+  <form id="mt5Form">
+    <input type="text" id="login" placeholder="MT5 Login" required>
+    <input type="password" id="password" placeholder="MT5 Password" required>
+    <input type="text" id="broker" placeholder="Broker (Exness-Live3)" required>
+    
+    <select id="risk_type" required>
+      <option value="">Select Risk Type</option>
+      <option value="fixed">Fixed Lot</option>
+      <option value="percent">Percent Balance</option>
+    </select>
+    
+    <input type="text" id="risk_value" placeholder="Risk Value (e.g. 0.01 or 5%)" required>
 
-        <label for="risk_type">Risk Type</label>
-        <select id="risk_type" name="risk_type">
-          <option value="">Select Risk Type</option>
-          <option value="fixed">Fixed Lot</option>
-          <option value="percent">Percent Balance</option>
-          <option value="custom">Other (type below)</option>
-        </select>
-        <input type="text" id="custom_risk_type" placeholder="Enter custom risk type">
+    <button type="submit">Save Details</button>
+  </form>
 
-        <label for="risk_value">Risk Value</label>
-        <select id="risk_value" name="risk_value">
-          <option value="">Select Risk Value</option>
-          <option value="0.01">0.01</option>
-          <option value="0.05">0.05</option>
-          <option value="0.10">0.10</option>
-          <option value="1%">1%</option>
-          <option value="5%">5%</option>
-          <option value="custom">Other (type below)</option>
-        </select>
-        <input type="text" id="custom_risk_value" placeholder="Enter custom risk value">
-
-        <button type="submit">💾 Save Details</button>
-        <div class="message" id="formMsg"></div>
-        <div class="back-btn" onclick="Telegram.WebApp.close()">🔙 Back to Bot</div>
-      </form>
-    </div>
-  </main>
+  <div class="message" id="formMsg"></div>
 
   <script>
-    Telegram.WebApp.ready(); // WAJIB untuk aktifkan context Telegram
+    Telegram.WebApp.ready(); // WAJIB activekan Telegram context
 
     const form = document.getElementById("mt5Form");
     const msg = document.getElementById("formMsg");
 
-    form.addEventListener("submit", async function(e) {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
       msg.textContent = "Saving... Please wait.";
-      msg.className = "message loading";
 
-      const login = document.getElementById("login").value;
-      const password = document.getElementById("password").value;
-      const broker = document.getElementById("broker").value;
-
-      let risk_type = document.getElementById("risk_type").value;
-      if (risk_type === "custom") {
-        risk_type = document.getElementById("custom_risk_type").value;
-      }
-
-      let risk_value = document.getElementById("risk_value").value;
-      if (risk_value === "custom") {
-        risk_value = document.getElementById("custom_risk_value").value;
-      }
+      const login = document.getElementById("login").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const broker = document.getElementById("broker").value.trim();
+      const risk_type = document.getElementById("risk_type").value.trim();
+      const risk_value = document.getElementById("risk_value").value.trim();
 
       let user_id = Telegram.WebApp.initDataUnsafe?.user?.id;
-
-      // ✅ Fallback dummy user_id untuk test luar Telegram
       if (!user_id) {
-        user_id = 999999999;
+        user_id = 999999999; // Dummy for testing outside Telegram
       }
 
       const data = { user_id, login, password, broker, risk_type, risk_value };
@@ -173,18 +89,19 @@
         const result = await res.json();
 
         if (res.ok) {
-          msg.textContent = "✅ Your account has been saved!";
-          msg.className = "message success";
+          msg.style.color = "#00ff99";
+          msg.textContent = "✅ Saved successfully!";
         } else {
-          msg.textContent = result.error || "❌ Failed to save. Please check your input.";
-          msg.className = "message";
+          msg.style.color = "orange";
+          msg.textContent = result.error || "❌ Failed to save!";
         }
-      } catch (err) {
-        console.error("❌ Network error:", err);
-        msg.textContent = "❌ Network error. Try again later.";
-        msg.className = "message";
+      } catch (error) {
+        console.error("Network Error:", error);
+        msg.style.color = "red";
+        msg.textContent = "❌ Network error!";
       }
     });
   </script>
+
 </body>
 </html>
