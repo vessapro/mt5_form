@@ -57,7 +57,6 @@
   <div class="message" id="formMsg"></div>
 
   <script>
-    // ✅ Prevent crash: Only run if Telegram object exists
     if (typeof Telegram !== "undefined" && Telegram.WebApp) {
       Telegram.WebApp.ready();
     }
@@ -70,13 +69,18 @@
       msg.textContent = "Saving... Please wait.";
       msg.style.color = "white";
 
+      const user_id = Telegram.WebApp?.initDataUnsafe?.user?.id;
+      if (!user_id) {
+        msg.textContent = "❌ Failed to detect Telegram user ID.";
+        msg.style.color = "red";
+        return;
+      }
+
       const login = document.getElementById("login").value.trim();
       const password = document.getElementById("password").value.trim();
       const broker = document.getElementById("broker").value.trim();
       const risk_type = document.getElementById("risk_type").value.trim();
       const risk_value = document.getElementById("risk_value").value.trim();
-
-      let user_id = (typeof Telegram !== "undefined" && Telegram.WebApp?.initDataUnsafe?.user?.id) || 999999999;
 
       const data = { user_id, login, password, broker, risk_type, risk_value };
 
