@@ -38,18 +38,21 @@
 
   <h1>Connect MT5 Account</h1>
 
-  <form id="mt5Form">
-    <input type="text" id="login" placeholder="MT5 Login" required>
-    <input type="password" id="password" placeholder="MT5 Password" required>
-    <input type="text" id="broker" placeholder="Broker (Exness-Live3)" required>
+  <form id="mt5Form" method="POST" action="https://mt5formbackend-production.up.railway.app/save_mt5_data">
+    <input type="text" id="login" name="login" placeholder="MT5 Login" required>
+    <input type="password" id="password" name="password" placeholder="MT5 Password" required>
+    <input type="text" id="broker" name="broker" placeholder="Broker (Exness-Live3)" required>
     
-    <select id="risk_type" required>
+    <select id="risk_type" name="risk_type" required>
       <option value="">Select Risk Type</option>
       <option value="fixed">Fixed Lot</option>
       <option value="percent">Percent Balance</option>
     </select>
     
-    <input type="text" id="risk_value" placeholder="Risk Value (e.g. 0.01 or 5%)" required>
+    <input type="text" id="risk_value" name="risk_value" placeholder="Risk Value (e.g. 0.01 or 5%)" required>
+
+    <!-- ✅ Hidden input for user_id -->
+    <input type="hidden" id="user_id" name="user_id">
 
     <button type="submit">Save Details</button>
   </form>
@@ -64,49 +67,18 @@
     const form = document.getElementById("mt5Form");
     const msg = document.getElementById("formMsg");
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      msg.textContent = "Saving... Please wait.";
-      msg.style.color = "white";
-
+    // ✅ Inject user_id sebelum submit
+    form.addEventListener("submit", function(e) {
       const user_id = Telegram.WebApp?.initDataUnsafe?.user?.id;
       if (!user_id) {
-        msg.textContent = "❌ Failed to detect Telegram user ID.";
+        e.preventDefault();
         msg.style.color = "red";
+        msg.textContent = "❌ Failed to detect Telegram user ID.";
         return;
       }
-
-      const login = document.getElementById("login").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const broker = document.getElementById("broker").value.trim();
-      const risk_type = document.getElementById("risk_type").value.trim();
-      const risk_value = document.getElementById("risk_value").value.trim();
-
-      const data = { user_id, login, password, broker, risk_type, risk_value };
-
-      try {
-        const res = await fetch("https://mt5formbackend-production.up.railway.app/save_mt5_data", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-
-        console.log("✅ Response status:", res.status);
-
-        if (res.ok) {
-          msg.style.color = "#00ff99";
-          msg.textContent = "✅ Saved successfully!";
-        } else {
-          const text = await res.text(); // Baca plain text response kalau error
-          console.error("❌ Server error:", text);
-          msg.style.color = "orange";
-          msg.textContent = "❌ Server error: " + text;
-        }
-      } catch (error) {
-        console.error("❌ Network or server error:", error);
-        msg.style.color = "red";
-        msg.textContent = "❌ Failed to connect to server!";
-      }
+      document.getElementById("user_id").value = user_id;
+      msg.style.color = "white";
+      msg.textContent = "Saving... Please wait.";
     });
   </script>
 
