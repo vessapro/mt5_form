@@ -91,19 +91,21 @@
           body: JSON.stringify(data)
         });
 
-        const result = await res.json();
+        console.log("✅ Response status:", res.status);
 
         if (res.ok) {
           msg.style.color = "#00ff99";
           msg.textContent = "✅ Saved successfully!";
         } else {
+          const text = await res.text(); // Baca plain text response kalau error
+          console.error("❌ Server error:", text);
           msg.style.color = "orange";
-          msg.textContent = result.error || "❌ Failed to save!";
+          msg.textContent = "❌ Server error: " + text;
         }
       } catch (error) {
-        console.error("❌ Network error:", error);
+        console.error("❌ Network or server error:", error);
         msg.style.color = "red";
-        msg.textContent = "❌ Network error!";
+        msg.textContent = "❌ Failed to connect to server!";
       }
     });
   </script>
